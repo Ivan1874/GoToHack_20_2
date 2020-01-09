@@ -1,0 +1,59 @@
+{% import "wtf.html" as wtf %}
+
+<!DOCTYPE html>
+<html{% block html_attribs %} lang="ru"{% endblock %}>
+{% block html %}
+    <head>
+        <title>{% block title %}{{ title|default }}{% endblock %}</title>
+        {% block metas %}
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta charset="UTF-8">
+        {% endblock %}
+
+        {% block styles %}
+            <link rel="stylesheet" href="{{ url_for('send_static', path='css/bootstrap.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('send_static', path='css/mdb.min.css') }}">
+        {% endblock %}
+    </head>
+    <body onload=""{% block body_attribs %}{% endblock %} style="background-color: ghostwhite">
+    <p class="row">
+        <div class="col-xs-offset-2 col-sm-offset-2 col-xs-8 col-sm-8 text-justify"></div>
+        <p class="text-center">
+        {% block body %}
+            {% block navbar %}
+
+            {% endblock %}
+            {% block content %}
+                <div class="my-3 mx-3 col-xs-6 d-flex flex-column h-100 justify-content-center align-items-center">
+                    <div id="notifications"></div>
+                    {% block app_content %}
+
+                    {% endblock %}
+                </div>
+            {% endblock %}
+
+            {% block scripts %}
+                <script type="text/javascript" src="{{ url_for('send_static', path='js/jquery-3.4.1.slim.min.js') }}"></script>
+                <script type="text/javascript" src="{{ url_for('send_static', path='js/bootstrap.min.js') }}"></script>
+                <script type="text/javascript" src="{{ url_for('send_static', path='js/mdb.min.js') }}"></script>
+                <script type="text/javascript" src="{{ url_for('send_static', path='js/popper.min.js') }}"></script>
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        {% with messages = get_flashed_messages() %}
+                            {% if messages %}
+                                {% for message in messages %}
+                                    Notify("{{ message }}");
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        {% block documentready %}
+                        {% endblock %}
+                    });
+                </script>
+            {% endblock %}
+        {% endblock %}
+        </p>
+    </div>
+    </body>
+{% endblock %}
+</html>
