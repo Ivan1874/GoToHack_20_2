@@ -1,12 +1,13 @@
 from tempfile import mktemp
 
-from flask import render_template, send_from_directory, redirect, send_file
+from flask import redirect
+from flask import render_template, send_from_directory, send_file
 
 from app import app
 from app.forms import InputForm, Mode
 from .convert import zipdir
+import os
 
-from flask import render_template, send_from_directory, send_file
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
@@ -14,11 +15,13 @@ def main():
     mode = Mode().mode.data
     if form.validate_on_submit():
         return redirect('/load')
-    return render_template('home_page.html', title='Hurt your friend!', form=form)
+    return render_template('index.html', title='Hurt your friend!', form=form)
+
 
 @app.route('/image/<emotion>')
 def get_emotion(emotion):
-    return send_file(f'C:\\Users\\Александр\\PycharmProjects\\GoToHack_20_2\\tmp\\images\\{emotion}.png', cache_timeout=0)
+    return send_file(os.path.join(app.root_path, f'../tmp/images/{emotion}.png'),
+                     cache_timeout=0)
 
 
 @app.route('/load', methods=['GET', 'POST'])
@@ -33,7 +36,8 @@ def index():
         zipdir(filename2, 'audios')
         return redirect('/game')
     else:
-        return render_template('index.html', title="Hurt your friend", form=form, image='happy')
+        return render_template('load_page.html', title="Hurt your friend", form=form, image='happy')
+
 
 @app.route('/game')
 def game():
@@ -47,4 +51,4 @@ def send_static(path):
 
 @app.route('/assets/<path>')
 def send_asset(path):
-    return send_file(f'/media/fox/D/_Progr/_Python/GoToHack_20_2/app/static/assets/{path}', cache_timeout=0)
+    return send_file(os.path.join(app.root_path, f'static/assets/{path}'), cache_timeout=0)
