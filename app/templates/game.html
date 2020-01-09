@@ -6,54 +6,102 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Hurt your friend</title>
-    <link rel="stylesheet" href="{{ url_for('send_static', path='css/select_weapon_btn.css') }}">
+    <style>
+        button {
+            border: none;
+            outline: none;
+        }
+
+        .circle {
+            display: block;
+            position: relative;
+            padding: 0;
+            z-index: 98;
+            margin: 0 auto;
+            -webkit-box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.3);
+            -moz-box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.3);
+            box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            height: 60px;
+            width: 60px;
+            background-color: #4a148c;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .circle:active {
+            transform: scale(0.9);
+            box-shadow: 0 2px 15px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .circle:hover {
+            cursor: pointer;
+            background-color: #6a1b9a;
+            box-shadow: 0 8px 15px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .wrapper {
+            position: fixed;
+            left: 1400px;
+            top: 10px;
+            text-align: center;
+        }
+
+        .wrapper a {
+            color: white;
+            box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.3);
+            font-family: cursive;
+            font-size: 30pt;
+        }
+
+        .wrapper ul {
+            padding: 0;
+            display: flex;
+            flex-direction: row;
+            list-style: none;
+        }
+
+        .wrapper li {
+            margin: 0 20px 0 0;
+        }
+    </style>
 </head>
 <body style="margin: 0; position: fixed;">
-<div class="wrapper" style="position:fixed; left: 1720px; top: 200px;">
-    <input class="hidden-trigger" id="toogle" type="checkbox">
-    <label class="circle" for="toogle">
-        <img src="{{ url_for('send_static', path='cross.png') }}"
-             alt=""/>
-    </label>
-
-    <div class="subs">
-        <button class="sub-circle" onmouseup="add_lesh()">
-            <input class="hidden-sub-trigger" id="sub1" type="radio" name="sub-circle" value="1"/>
-            <label for="sub1"></label>
-        </button>
-        <button class="sub-circle">
-            <input class="hidden-sub-trigger" id="sub2" type="radio" name="sub-circle" value="1"/>
-            <label for="sub2"></label>
-        </button>
-        <button class="sub-circle">
-            <input class="hidden-sub-trigger" id="sub3" type="radio" name="sub-circle" value="1"/>
-            <label for="sub3"></label>
-        </button>
-        <button class="sub-circle">
-            <input class="hidden-sub-trigger" id="sub4" type="radio" name="sub-circle" value="1"/>
-            <label for="sub4"></label>
-        </button>
-        <button class="sub-circle">
-            <input class="hidden-sub-trigger" id="sub5" type="radio" name="sub-circle" value="1"/>
-            <label for="sub5"></label>
-        </button>
-        <button class="sub-circle">
-            <input class="hidden-sub-trigger" id="sub6" type="radio" name="sub-circle" value="1"/>
-            <label for="sub6"></label>
-        </button>
-        <button class="sub-circle">
-            <input class="hidden-sub-trigger" id="sub7" type="radio" name="sub-circle" value="1"/>
-            <label for="sub7"></label>
-        </button>
-        <button class="sub-circle">
-            <input class="hidden-sub-trigger" id="sub8" type="radio" name="sub-circle" value="1"/>
-            <label for="sub8"></label>
-        </button>
-    </div>
+<div class="wrapper">
+    <ul>
+        <li>
+            <a>ЛЕЩ</a>
+            <button class="circle" onmouseup="add_lesh()">
+            </button>
+        </li>
+        <li>
+            <a>Бутылка</a>
+            <button class="circle" onmouseup="add_bottle()">
+            </button>
+        </li>
+        <li>
+            <a>Убрать все</a>
+            <button class="circle" onmouseup="remove_all()">
+            </button>
+        </li>
+    </ul>
 </div>
 <script src="{{ url_for('send_static', path='js/matter.js') }}"></script>
 <script>
-    var Engine = Matter.Engine,
+
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET', '/imgassets/data.json', false);
+    xhr.send();
+
+    let resp = null;
+
+    if (xhr.status !== 200) {
+        alert('ААААААААААААААААа АШИПКА STOP 00000000000 ПРИШЛО ВРЕМЯ ПЕРЕУСТАНАВЛИВАТЬ ШИИИИНДОВС');
+    } else {
+        resp = JSON.parse(xhr.responseText);
+    }
+
+    const Engine = Matter.Engine,
         Render = Matter.Render,
         Common = Matter.Common,
         Runner = Matter.Runner,
@@ -92,18 +140,20 @@
 
     let walls = [
         // walls
-        Bodies.rectangle(960, -225, 1920, 500, {isStatic: true}),
-        Bodies.rectangle(960, 1305, 1920, 500, {isStatic: true}),
-        Bodies.rectangle(2145, 540, 500, 1080, {isStatic: true}),
-        Bodies.rectangle(-225, 540, 500, 1080, {isStatic: true})
+        Bodies.rectangle(960, -225, 2500, 500, {isStatic: true}),
+        Bodies.rectangle(960, 1305, 2500, 500, {isStatic: true}),
+        Bodies.rectangle(2145, 540, 500, 1500, {isStatic: true}),
+        Bodies.rectangle(-225, 540, 500, 1500, {isStatic: true})
     ];
 
     World.add(world, walls);
     let isStatic = false,
         commonOptions = {
-            friction: 0.4,
-            frictionAir: 0.005,
-            isStatic: isStatic
+            friction: 0.001,
+            frictionAir: 0.0001,
+            frictionStatic: 0.001,
+            isStatic: isStatic,
+            restitution: 0.9
         },
         bodyOptions = {
             ...commonOptions,
@@ -132,76 +182,76 @@
             ...commonOptions,
             ...{
                 render: {
-                    fillStyle: '#F35e66',
-                    sprite: {
-                        texture: '/assets/indenbom.jpg'
-                    }
+                    fillStyle: '#F35e66'
+                },
+                chamfer: {
+                    radius: 10
                 }
             }
         },
         body = Bodies.rectangle(400, 300, 70, 240, {...bodyOptions}),
-        leftHand = Bodies.rectangle(320, 250, 30, 100, {...handsOptions}),
-        rightHand = Bodies.rectangle(480, 250, 30, 100, {...handsOptions}),
-        leftLeg = Bodies.rectangle(340, 430, 30, 80, {...handsOptions}),
-        rightLeg = Bodies.rectangle(460, 430, 30, 80, {...handsOptions}),
-        head = Bodies.circle(400, 135, 40, headOptions);
+        leftHand = Bodies.rectangle(320, 280, 30, 100, {...handsOptions, ...{angle: deg2rad(40)}}),
+        rightHand = Bodies.rectangle(480, 280, 30, 100, {...handsOptions, ...{angle: deg2rad(-40)}}),
+        leftLeg = Bodies.rectangle(340, 430, 30, 80, {...handsOptions, ...{angle: deg2rad(20)}}),
+        rightLeg = Bodies.rectangle(460, 430, 30, 80, {...handsOptions, ...{angle: deg2rad(-20)}}),
+        head = Bodies.rectangle(400, 135, 60, 80, headOptions);
 
+    let leftLegConst = Constraint.create({
+            bodyA: body, bodyB: leftLeg, stiffness: 0.6,
+            pointA: {x: -33, y: 101},
+            pointB: Vector.rotate({x: 10, y: -34}, deg2rad(20)),
+            render: {visible: false}
+        }),
+        rightLegConst = Constraint.create({
+            bodyA: body, bodyB: rightLeg, stiffness: 0.6,
+            pointA: {x: 33, y: 101},
+            pointB: Vector.rotate({x: -10, y: -34}, deg2rad(-20)),
+            render: {visible: false}
+        }),
+        leftHandConst = Constraint.create({
+            bodyA: body, bodyB: leftHand, stiffness: 0.6,
+            pointA: {x: -35, y: -49},
+            pointB: Vector.rotate({x: 10, y: -46}, deg2rad(40)),
+            render: {visible: false}
+        }),
+        rightHandConst = Constraint.create({
+            bodyA: body, bodyB: rightHand, stiffness: 0.6,
+            pointA: {x: 35, y: -49},
+            pointB: Vector.rotate({x: -10, y: -46}, deg2rad(-40)),
+            render: {visible: false}
+        }),
+        headConst = Constraint.create({
+            bodyA: body, bodyB: head, stiffness: 0.6,
+            pointA: {x: 0, y: -120},
+            pointB: {x: 0, y: 40},
+            render: {visible: false}
+        });
 
-    Matter.World.add(world, [body, leftHand, rightHand, leftLeg, rightLeg, head]);
+    person = Composite.create({
+        bodies: [body, leftHand, rightHand, leftLeg, rightLeg, head],
+        constraints: [
+            leftLegConst, rightLegConst, leftHandConst,
+            rightHandConst, headConst]
+    });
+
+    Matter.World.add(world, person);
 
     // add mouse control
     let mouse = Mouse.create(render.canvas),
         mouseConstraint = MouseConstraint.create(engine, {
             mouse: mouse,
             constraint: {
-                stiffness: 0.1,
+                stiffness: 0.6,
+                length: 0,
+                angularStiffness: 0,
                 render: {visible: false}
             }
         });
     World.add(world, mouseConstraint);
     render.mouse = mouse;
 
-
-    Body.rotate(leftHand, deg2rad(40));
-    Body.rotate(rightHand, deg2rad(-40));
-    World.add(world, Constraint.create({
-        bodyA: body, bodyB: leftHand, length: 0, stiffness: 0.1,
-        pointA: {x: -35, y: -79},
-        pointB: Vector.rotate({x: 10, y: -46}, deg2rad(40)),
-        render: {visible: false}
-    }));
-    World.add(world, Constraint.create({
-        bodyA: body, bodyB: rightHand, length: 0, stiffness: 0.1,
-        pointA: {x: 35, y: -79},
-        pointB: Vector.rotate({x: -10, y: -46}, deg2rad(-40)),
-        render: {visible: false}
-    }));
-
-
-    Body.rotate(leftLeg, deg2rad(20));
-    Body.rotate(rightLeg, deg2rad(-20));
-    World.add(world, Constraint.create({
-        bodyA: body, bodyB: leftLeg, length: 0, stiffness: 0.1,
-        pointA: {x: -33, y: 101},
-        pointB: Vector.rotate({x: 10, y: -34}, deg2rad(20)),
-        render: {visible: false}
-    }));
-    World.add(world, Constraint.create({
-        bodyA: body, bodyB: rightLeg, length: 0, stiffness: 0.1,
-        pointA: {x: 33, y: 101},
-        pointB: Vector.rotate({x: -10, y: -34}, deg2rad(-20)),
-        render: {visible: false}
-    }));
-
-
-    World.add(world, Constraint.create({
-        bodyA: body, bodyB: head, length: 0, stiffness: 0.1,
-        pointA: {x: 0, y: -120},
-        pointB: {x: 0, y: 40},
-        render: {visible: false}
-    }));
-
     let objects = [];
+    let sound_now = null;
 
     function remove_all() {
         objects.forEach((obj) => {
@@ -210,7 +260,12 @@
         objects = [];
     }
 
-    Events.on(engine, 'collisionStart', function(event) {
+    function choose(choices) {
+        const index = Math.floor(Math.random() * choices.length);
+        return choices[index];
+    }
+
+    Events.on(engine, 'collisionStart', function (event) {
         let pairs = event.pairs;
         for (let i = 0; i < pairs.length; i++) {
             let pair = pairs[i];
@@ -218,23 +273,49 @@
                 continue
             }
             if (objects.indexOf(pair.bodyA) !== -1) {
-                pair.bodyB.render.fillStyle = '#333';
+                if (pair.bodyA.label === 'lesh') {
+                    Body.setVelocity(pair.bodyB, {x: pair.bodyA.velocity.x * 2, y: pair.bodyA.velocity.y * 3});
+                    if (pair.bodyB === head) {new Audio('/assets/lesh.mp3').play();}
+                } else if (pair.bodyA.label === 'bottle') {
+                    new Audio('/assets/bottle.m4a').play();
+                    World.remove(world, pair.bodyA);
+                }
+                if (pair.bodyB === body) {
+                    head.render.sprite.texture = '/imgassets/' + choose(resp.surprise);
+                } else if (pair.bodyB === head) {
+                    head.render.sprite.texture = '/imgassets/' + choose(resp.anger);
+                } else if ((pair.bodyB === leftHand) || (pair.bodyB === rightHand)) {
+                    head.render.sprite.texture = '/imgassets/' + choose(resp.sad);
+                } else if ((pair.bodyB === leftLeg) || (pair.bodyB === rightLeg)) {
+                    head.render.sprite.texture = '/imgassets/' + choose(resp.happiness);
+                }
+
+                if (choose([1, 2, 3, 4, 5, 6, 7, 8]) === 5) {
+                    if (sound_now !== null) { sound_now.pause() }
+                    sound_now = new Audio('/assets/bdsm3.mp3');
+                    sound_now.play();
+                }
             } else if (objects.indexOf(pair.bodyB) !== -1) {
-                pair.bodyA.render.fillStyle = '#333';
-            }
-        }
-    });
-    Events.on(engine, 'collisionEnd', function(event) {
-        let pairs = event.pairs;
-        for (let i = 0; i < pairs.length; i++) {
-            let pair = pairs[i];
-            if ((walls.indexOf(pair.bodyA) !== -1) || (walls.indexOf(pair.bodyA) !== -1)) {
-                continue
-            }
-            if (objects.indexOf(pair.bodyA) !== -1) {
-                pair.bodyB.render.fillStyle = '#F35e66';
-            } else if (objects.indexOf(pair.bodyB) !== -1) {
-                pair.bodyA.render.fillStyle = '#F35e66';
+                if (pair.bodyB.label === 'lesh') {
+                    Body.setVelocity(pair.bodyA, {x: pair.bodyB.velocity.x * 2, y: pair.bodyB.velocity.y * 3});
+                    if (pair.bodyA === head) {new Audio('/assets/lesh.mp3').play();}
+                } else if (pair.bodyB.label === 'bottle') {
+                    new Audio('/assets/bottle.m4a').play();
+                    World.remove(world, pair.bodyB);
+                }
+                if (pair.bodyA === body) {
+                    head.render.sprite.texture = '/imgassets/' + choose(resp.surprise);
+                } else if (pair.bodyA === head) {
+                    head.render.sprite.texture = '/imgassets/' + choose(resp.anger);
+                } else if ((pair.bodyA === leftHand) || (pair.bodyA === rightHand)) {
+                    head.render.sprite.texture = '/imgassets/' + choose(resp.sad);
+                } else if ((pair.bodyA === leftLeg) || (pair.bodyA === rightLeg)) {
+                    head.render.sprite.texture = '/imgassets/' + choose(resp.happiness);
+                }
+
+                if (choose([1, 2, 3, 4]) === 1) {
+                    new Audio('/assets/bdsm3.mp3').play();
+                }
             }
         }
     });
@@ -242,13 +323,30 @@
     function add_lesh() {
         remove_all();
         objects.push(Bodies.rectangle(1720, 200, 195, 91, {
-            mass: 50, friction: 0.4, frictionAir: 0.005,
+            mass: 30, friction: 0.4, frictionAir: 0.01, density: 0.01,
+            label: 'lesh',
             chamfer: {
                 radius: 15
             },
             render: {
                 sprite: {
                     texture: '/assets/lesh.png'
+                }
+            }
+        }));
+        World.add(world, objects[objects.length - 1]);
+    }
+
+    function add_bottle() {
+        objects.push(Bodies.rectangle(1720, 200, 120, 33, {
+            friction: 0.4, frictionAir: 0.001, mass: 0,
+            label: 'bottle',
+            chamfer: {
+                radius: 15
+            },
+            render: {
+                sprite: {
+                    texture: '/assets/bottle.png'
                 }
             }
         }));

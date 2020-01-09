@@ -8,11 +8,11 @@ app.jinja_env.globals['bootstrap_is_hidden_field'] = lambda field: isinstance(fi
 
 
 class InputForm(FlaskForm):
-    images = FileField('Your images: ', validators=[DataRequired()])
-    audios = FileField('Your audios: ', validators=[DataRequired()])
-    submit = SubmitField('Touch!')
+    images = FileField('Фото: ', validators=[DataRequired()])
+    # audios = FileField('Аудио: ')
+    submit = SubmitField('Далее!')
 
 
 class Mode(FlaskForm):
-    mode = RadioField(validators=[DataRequired()], choices=[('standart', 'Standart'), ('bdsm', 'BDSM')])
+    # mode = RadioField(validators=[DataRequired()], choices=[('standart', 'Standart'), ('bdsm', 'BDSM')])
     button = SubmitField('Ок')

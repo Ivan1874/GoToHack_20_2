@@ -1,29 +1,15 @@
-import requests
-from secure import face_key
 import base64
 import os
+import random
+import requests
+import string
 
-def ai(name):
+from PIL import Image
 
-    files = os.listdir(f'C:\\Users\\Александр\\PycharmProjects\\GoToHack_20_2\\tmp\\{name}')
+from secure import face_key
 
-    # set to your own subscription key value
-    subscription_key = None
 
-    # replace <My Endpoint String> with the string from your endpoint URL
-    urls = []
-
-    for file in files:
-        with open(file, 'rb') as file:
-            url = 'https://api.imgbb.com/1/upload'
-            payload = {
-                'key': 'bb5e187707a0da1d1caa826ebe9467ed',
-                'image': base64.b64encode(file.read()),
-            }
-            res = requests.post(url, payload)
-
-        urls.append(res['data']['url'])
-
+def ai(files, load_root, save_root):
     end = 'https://westcentralus.api.cognitive.microsoft.com/face/v1.0/detect'
 
     headers = {'Ocp-Apim-Subscription-Key': face_key}
@@ -34,21 +20,26 @@ def ai(name):
         'returnFaceAttributes': 'age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise',
     }
 
-    def givejson(photos):
-        returnjson = {}
-        for ph in photos:
-            response = requests.post(end, params=params,
-                                     headers=headers, json={"url": ph})
-            resp = response.json()[0]
-            predictedem = max(resp['faceAttributes']['emotion'].items(), key=lambda x: x[1])[0]
-            if predictedem not in returnjson:
-                returnjson[predictedem] = [predictedem]
-            else:
-                returnjson[predictedem].append(predictedem)
-        return returnjson
+    returnjson = {}
+    for file in files:
+        with open(os.path.join(load_root, file), 'rb') as f:
+            payload = {
+                'key': 'bb5e187707a0da1d1caa826ebe9467ed',
+                'image': base64.b64encode(f.read()),
+            }
+        res = requests.post('https://api.imgbb.com/1/upload', payload)
+        response = requests.post(end, params=params,
+                                 headers=headers, json={"url": res.json()['data']['url']})
+        resp = response.json()[0]
+        cropped = Image.open(os.path.join(load_root, file)).crop((resp['faceRectangle']['left'], resp['faceRectangle']['top'],
+                                         resp['faceRectangle']['left'] + resp['faceRectangle']['width'],
+                                         resp['faceRectangle']['top'] + resp['faceRectangle']['height']))
+        new_path = os.path.join(save_root, ''.join(random.choices(string.ascii_lowercase, k=10)) + '.jpg')
+        cropped.save(new_path)
 
-    def crop_photo():
-        pass
-
-    givejson(urls)
-
+        predictedem = max(resp['faceAttributes']['emotion'].items(), key=lambda x: x[1])[0]
+        if predictedem not in returnjson:
+            returnjson[predictedem] = [os.path.basename(new_path)]
+        else:
+            returnjson[predictedem].append(os.path.basename(new_path))
+    return returnjson
