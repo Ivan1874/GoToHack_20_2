@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Hurt your friend</title>
+    <link rel="stylesheet" href="{{ url_for('send_static', path='css/select_weapon_btn.css') }}">
+</head>
+<body style="margin: 0; position: fixed;">
+<div class="wrapper" style="position:fixed; left: 1720px; top: 200px;">
+    <input class="hidden-trigger" id="toogle" type="checkbox">
+    <label class="circle" for="toogle">
+        <img src="{{ url_for('send_static', path='cross.png') }}"
+             alt=""/>
+    </label>
+
+    <div class="subs">
+        <button class="sub-circle" onmouseup="add_lesh()">
+            <input class="hidden-sub-trigger" id="sub1" type="radio" name="sub-circle" value="1"/>
+            <label for="sub1"></label>
+        </button>
+        <button class="sub-circle">
+            <input class="hidden-sub-trigger" id="sub2" type="radio" name="sub-circle" value="1"/>
+            <label for="sub2"></label>
+        </button>
+        <button class="sub-circle">
+            <input class="hidden-sub-trigger" id="sub3" type="radio" name="sub-circle" value="1"/>
+            <label for="sub3"></label>
+        </button>
+        <button class="sub-circle">
+            <input class="hidden-sub-trigger" id="sub4" type="radio" name="sub-circle" value="1"/>
+            <label for="sub4"></label>
+        </button>
+        <button class="sub-circle">
+            <input class="hidden-sub-trigger" id="sub5" type="radio" name="sub-circle" value="1"/>
+            <label for="sub5"></label>
+        </button>
+        <button class="sub-circle">
+            <input class="hidden-sub-trigger" id="sub6" type="radio" name="sub-circle" value="1"/>
+            <label for="sub6"></label>
+        </button>
+        <button class="sub-circle">
+            <input class="hidden-sub-trigger" id="sub7" type="radio" name="sub-circle" value="1"/>
+            <label for="sub7"></label>
+        </button>
+        <button class="sub-circle">
+            <input class="hidden-sub-trigger" id="sub8" type="radio" name="sub-circle" value="1"/>
+            <label for="sub8"></label>
+        </button>
+    </div>
+</div>
+<script src="{{ url_for('send_static', path='js/matter.js') }}"></script>
+<script>
+    var Engine = Matter.Engine,
+        Render = Matter.Render,
+        Common = Matter.Common,
+        Runner = Matter.Runner,
+        Composites = Matter.Composites,
+        Composite = Matter.Composite,
+        Events = Matter.Events,
+        Constraint = Matter.Constraint,
+        MouseConstraint = Matter.MouseConstraint,
+        Mouse = Matter.Mouse,
+        World = Matter.World,
+        Vector = Matter.Vector,
+        Body = Matter.Body,
+        Bodies = Matter.Bodies;
+
+    function deg2rad(degrees) {
+        return degrees * (Math.PI / 180);
+    }
+
+    var engine = Engine.create(),
+        world = engine.world;
+
+    var render = Render.create({
+        element: document.body,
+        engine: engine,
+        options: {
+            width: 1920,
+            height: 1080,
+            wireframes: false
+        }
+    });
+
+    Render.run(render);
+
+    let runner = Runner.create();
+    Runner.run(runner, engine);
+
+    let walls = [
+        // walls
+        Bodies.rectangle(960, -225, 1920, 500, {isStatic: true}),
+        Bodies.rectangle(960, 1305, 1920, 500, {isStatic: true}),
+        Bodies.rectangle(2145, 540, 500, 1080, {isStatic: true}),
+        Bodies.rectangle(-225, 540, 500, 1080, {isStatic: true})
+    ];
+
+    World.add(world, walls);
+    let isStatic = false,
+        commonOptions = {
+            friction: 0.4,
+            frictionAir: 0.005,
+            isStatic: isStatic
+        },
+        bodyOptions = {
+            ...commonOptions,
+            ...{
+                render: {
+                    fillStyle: '#F35e66',
+                },
+                isStatic: isStatic,
+                chamfer: {
+                    radius: 30
+                }
+            }
+        },
+        handsOptions = {
+            ...commonOptions,
+            ...{
+                render: {
+                    fillStyle: '#F35e66',
+                },
+                chamfer: {
+                    radius: 15
+                }
+            }
+        },
+        headOptions = {
+            ...commonOptions,
+            ...{
+                render: {
+                    fillStyle: '#F35e66',
+                    sprite: {
+                        texture: '/assets/indenbom.jpg'
+                    }
+                }
+            }
+        },
+        body = Bodies.rectangle(400, 300, 70, 240, {...bodyOptions}),
+        leftHand = Bodies.rectangle(320, 250, 30, 100, {...handsOptions}),
+        rightHand = Bodies.rectangle(480, 250, 30, 100, {...handsOptions}),
+        leftLeg = Bodies.rectangle(340, 430, 30, 80, {...handsOptions}),
+        rightLeg = Bodies.rectangle(460, 430, 30, 80, {...handsOptions}),
+        head = Bodies.circle(400, 135, 40, headOptions);
+
+
+    Matter.World.add(world, [body, leftHand, rightHand, leftLeg, rightLeg, head]);
+
+    // add mouse control
+    let mouse = Mouse.create(render.canvas),
+        mouseConstraint = MouseConstraint.create(engine, {
+            mouse: mouse,
+            constraint: {
+                stiffness: 0.1,
+                render: {visible: false}
+            }
+        });
+    World.add(world, mouseConstraint);
+    render.mouse = mouse;
+
+
+    Body.rotate(leftHand, deg2rad(40));
+    Body.rotate(rightHand, deg2rad(-40));
+    World.add(world, Constraint.create({
+        bodyA: body, bodyB: leftHand, length: 0, stiffness: 0.1,
+        pointA: {x: -35, y: -79},
+        pointB: Vector.rotate({x: 10, y: -46}, deg2rad(40)),
+        render: {visible: false}
+    }));
+    World.add(world, Constraint.create({
+        bodyA: body, bodyB: rightHand, length: 0, stiffness: 0.1,
+        pointA: {x: 35, y: -79},
+        pointB: Vector.rotate({x: -10, y: -46}, deg2rad(-40)),
+        render: {visible: false}
+    }));
+
+
+    Body.rotate(leftLeg, deg2rad(20));
+    Body.rotate(rightLeg, deg2rad(-20));
+    World.add(world, Constraint.create({
+        bodyA: body, bodyB: leftLeg, length: 0, stiffness: 0.1,
+        pointA: {x: -33, y: 101},
+        pointB: Vector.rotate({x: 10, y: -34}, deg2rad(20)),
+        render: {visible: false}
+    }));
+    World.add(world, Constraint.create({
+        bodyA: body, bodyB: rightLeg, length: 0, stiffness: 0.1,
+        pointA: {x: 33, y: 101},
+        pointB: Vector.rotate({x: -10, y: -34}, deg2rad(-20)),
+        render: {visible: false}
+    }));
+
+
+    World.add(world, Constraint.create({
+        bodyA: body, bodyB: head, length: 0, stiffness: 0.1,
+        pointA: {x: 0, y: -120},
+        pointB: {x: 0, y: 40},
+        render: {visible: false}
+    }));
+
+    let objects = [];
+
+    function remove_all() {
+        objects.forEach((obj) => {
+            World.remove(world, obj)
+        });
+        objects = [];
+    }
+
+    Events.on(engine, 'collisionStart', function(event) {
+        let pairs = event.pairs;
+        for (let i = 0; i < pairs.length; i++) {
+            let pair = pairs[i];
+            if ((walls.indexOf(pair.bodyA) !== -1) || (walls.indexOf(pair.bodyA) !== -1)) {
+                continue
+            }
+            if (objects.indexOf(pair.bodyA) !== -1) {
+                pair.bodyB.render.fillStyle = '#333';
+            } else if (objects.indexOf(pair.bodyB) !== -1) {
+                pair.bodyA.render.fillStyle = '#333';
+            }
+        }
+    });
+    Events.on(engine, 'collisionEnd', function(event) {
+        let pairs = event.pairs;
+        for (let i = 0; i < pairs.length; i++) {
+            let pair = pairs[i];
+            if ((walls.indexOf(pair.bodyA) !== -1) || (walls.indexOf(pair.bodyA) !== -1)) {
+                continue
+            }
+            if (objects.indexOf(pair.bodyA) !== -1) {
+                pair.bodyB.render.fillStyle = '#F35e66';
+            } else if (objects.indexOf(pair.bodyB) !== -1) {
+                pair.bodyA.render.fillStyle = '#F35e66';
+            }
+        }
+    });
+
+    function add_lesh() {
+        remove_all();
+        objects.push(Bodies.rectangle(1720, 200, 195, 91, {
+            mass: 50, friction: 0.4, frictionAir: 0.005,
+            chamfer: {
+                radius: 15
+            },
+            render: {
+                sprite: {
+                    texture: '/assets/lesh.png'
+                }
+            }
+        }));
+        World.add(world, objects[objects.length - 1]);
+    }
+</script>
+</body>
+</html>

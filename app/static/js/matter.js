@@ -1734,7 +1734,7 @@ var Body = _dereq_('./Body');
      * @param {composite} composite
      * @param {number} scaleX
      * @param {number} scaleY
-     * @param {vector} point
+     * @param {{x: number, y: number}} point
      * @param {bool} [recursive=true]
      */
     Composite.scale = function(composite, scaleX, scaleY, point, recursive) {
